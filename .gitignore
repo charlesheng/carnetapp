@@ -1,0 +1,3 @@
+*.pyc
+output/pics/*.jpg
+output/carnets/*.jpg
