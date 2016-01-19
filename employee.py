@@ -26,6 +26,8 @@ class Employee:
             self.ssurname = r['sapellido']
             self.position = r['cargo']
             self.department = r['dpto'] + "\n\n"
+        else:
+            raise Exception("Sorry I can't find '%s'" % employee_id)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ from PIL import Image, ImageFont, ImageDraw
 
 class Carnet:
 
-    _bg_img_path = 'data/front-bg.jpg'
+    _bg_img_path = 'data/front-bg.png'
     _font_path = 'data/DejaVuSans-Bold.ttf'
     _employee = None
 
@@ -27,20 +27,20 @@ class Carnet:
         dpmt = self._employee.department.split("\n")
 
         draw = ImageDraw.Draw(imbg)
-        font = ImageFont.truetype(self._font_path, size=16)
+        font = ImageFont.truetype(self._font_path, size=14)
         font2 = ImageFont.truetype(self._font_path, size=18)
         font3 = ImageFont.truetype(self._font_path, size=32)
 
-        line_size = 20
+        line_size = 15
 
-        idnum_xpos = 220
-        idnum_ypos = 110
+        idnum_xpos = 180
+        idnum_ypos = 275
 
-        name_xpos = 220
-        name_ypos = 180
+        name_xpos = 180
+        name_ypos = 172
 
-        surname_xpos = 220
-        surname_ypos = 260
+        surname_xpos = 180
+        surname_ypos = 222
 
         dpto_xpos = 20
         dpto_ypos = 340
@@ -113,8 +113,8 @@ class Carnet:
         photo_y2crop = 480
 
         photo_xpos = 20
-        photo_ypos = 70
-        photo_size = (180, 240)
+        photo_ypos = 140
+        photo_size = (145, 193)
 
         box = (photo_x1crop, photo_y1crop, photo_x2crop, photo_y2crop)
         region = imph.crop(box)

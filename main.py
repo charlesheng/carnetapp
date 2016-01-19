@@ -1,15 +1,12 @@
 #!/usr/bin/python
 from gi.repository import Gtk
-from gi.repository import GLib
 from os import system
-import threading
 
+from carnet import Carnet
 from employee import Employee
 
-# Use threads                                       
-GLib.threads_init()
 
-## FOR COMMON USE
+# ---- FOR COMMON USE
 def execute_cmd(cmd_string):
     system("clear")
     a = system(cmd_string)
@@ -22,7 +19,7 @@ def execute_cmd(cmd_string):
     print ""
 
     return a
-## FOR COMMON USE
+# ---- FOR COMMON USE
 
 
 class MyWindow(Gtk.Window):
@@ -30,6 +27,8 @@ class MyWindow(Gtk.Window):
     def __init__(self):
 
         Gtk.Window.__init__(self, title="ID Card Generator - By Erick Birbe")
+
+        self.employee = None
 
         self.grid = Gtk.Grid()
         self.grid.set_column_spacing(10)
@@ -43,14 +42,14 @@ class MyWindow(Gtk.Window):
         self.lbl_name = Gtk.Label("Name:")
         self.txt_name = Gtk.Entry()
         self.txt_name.set_editable(False)
-        
+
         self.txt_name1 = Gtk.Entry()
         self.txt_name1.set_editable(False)
 
         self.lbl_surname = Gtk.Label("Surname:")
         self.txt_surname = Gtk.Entry()
         self.txt_surname.set_editable(False)
-        
+
         self.txt_surname1 = Gtk.Entry()
         self.txt_surname1.set_editable(False)
 
@@ -65,15 +64,16 @@ class MyWindow(Gtk.Window):
 
         self.btn_process = Gtk.Button("Process!")
         self.btn_process.connect('clicked', self.on_btn_process_clicked)
-        
+
         self.btn_take_picture = Gtk.Button("Take a Picture")
-        self.btn_take_picture.connect('clicked', self.on_btn_take_picture_clicked)
-        
+        self.btn_take_picture.connect(
+            'clicked', self.on_btn_take_picture_clicked)
+
         self.image = Gtk.Image()
 
         self.grid.add(self.lbl_search)
         self.grid.attach(self.txt_search, 1, 0, 1, 1)
-        
+
         self.grid.attach(self.lbl_name, 0, 1, 1, 1)
         self.grid.attach(self.txt_name, 1, 1, 1, 1)
         self.grid.attach(self.txt_name1, 1, 2, 1, 1)
@@ -92,7 +92,7 @@ class MyWindow(Gtk.Window):
         self.grid.attach(self.btn_take_picture, 0, 12, 2, 1)
 
         self.clear_form()
-        
+
     def clear_form(self):
         widgets = [
             self.txt_name,
@@ -104,33 +104,70 @@ class MyWindow(Gtk.Window):
         ]
         for w in widgets:
             w.set_text('')
-        self.load_image('data/front-bg-white.png')
+        self.load_image()
 
-    def load_image(self, path):
+    def load_image(self, file_name=None):
+
+        print "Filename = %s" % file_name
+
         self.image.destroy()
-        self.image = Gtk.Image.new_from_file(path)
+
+        if file_name is None:
+            self.image = Gtk.Image.new_from_file('data/front-bg-white.png')
+        else:
+            self.image = Gtk.Image.new_from_file(
+                'output/carnets/%s.jpg' % file_name)
+
         self.grid.attach(self.image, 3, 0, 1, 20)
         self.image.show()
 
+    def set_employee(self, pid):
+        if self.employee is None or self.employee.pid != pid:
+            self.employee = Employee(pid)
+            self.txt_name.set_text(self.employee.name)
+            self.txt_name1.set_text(self.employee.sname)
+            self.txt_surname.set_text(self.employee.surname)
+            self.txt_surname1.set_text(self.employee.ssurname)
+            self.txt_position.get_buffer().set_text(self.employee.position)
+            self.txt_department.get_buffer().set_text(self.employee.department)
+
+    def update_employee(self):
+
+        start, end = self.txt_position.get_buffer().get_bounds()
+        self.employee.position = self.txt_position.get_buffer().get_text(start, end, False)
+
+        start, end = self.txt_department.get_buffer().get_bounds()
+        self.employee.department = self.txt_department.get_buffer().get_text(start, end, False)
+
+        carnet = Carnet(self.employee)
+        carnet.create()
+
     def on_btn_process_clicked(self, widget):
-        self.load_image('output/carnets/%s.jpg' % self.txt_search.get_text())
-        
+
+        if self.employee is None:
+            return
+
+        self.update_employee()
+        self.load_image(self.employee.pid)
+
     def on_txt_search_activate(self, widget):
         self.clear_form()
-        e = Employee(widget.get_text())
-        self.txt_name.set_text(e.name)
-        self.txt_name1.set_text(e.sname)
-        self.txt_surname.set_text(e.surname)
-        self.txt_surname1.set_text(e.ssurname)
-        self.txt_position.get_buffer().set_text(e.position)
-        self.txt_department.get_buffer().set_text(e.department)
-        self.btn_process.do_activate(self.btn_process)
-        
+        try:
+            self.set_employee(widget.get_text())
+            self.load_image(self.employee.pid)
+        except Exception, excp:
+            print excp
+            self.clear_form()
+
     def on_btn_take_picture_clicked(self, widget):
-        execute_cmd("python camera.py %s" % 17936784)
+        status = execute_cmd("python camera.py %s" % self.employee.pid)
+        if status == 0:
+            carnet = Carnet(self.employee)
+            carnet.create()
+            self.load_image(self.employee.pid)
 
 if __name__ == "__main__":
-	win = MyWindow()
-	win.connect("delete-event", Gtk.main_quit)
-	win.show_all()
-	Gtk.main()
+    win = MyWindow()
+    win.connect("delete-event", Gtk.main_quit)
+    win.show_all()
+    Gtk.main()

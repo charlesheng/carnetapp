@@ -11,7 +11,7 @@ def capture(img_file):
         p2 = (140 + 360, 480)
         cv2.rectangle(im, p1, p2, (255, 255, 255), thickness=2)
 
-        cv2.imshow('Mi Camara Fotografica', im)
+        cv2.imshow('Camera', im)
         key = cv2.waitKey(10)
 
         if key % 256 == 27:    # Esc key to stop
@@ -19,7 +19,7 @@ def capture(img_file):
         elif key % 256 == ord(' ') or \
                 key % 256 == 141 or key % 256 == 10:    # Capture the image
             cv2.imwrite(img_file, im)
-            cv2.imshow('Mi Foto Capturada', im)
+            cv2.imshow('Picture Captured', im)
         elif key == -1:  # normally -1 returned,so don't print it
             continue
         else:
