@@ -8,3 +8,8 @@
 - Run:
 
 	python main.py
+
+- TODO:
+
+	GTK User Interface
+	
