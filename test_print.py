@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from gi.repository import Gtk
-
+import Image, StringIO, cairo
 
 class MyWindow(Gtk.Window):
 
@@ -25,10 +25,16 @@ class MyWindow(Gtk.Window):
         # ctx.set_source_rgb(0.5, 0.5, 1)
         #ctx.rectangle(w*0.1, h*0.1, w*0.8, h*0.8)
         #ctx.stroke()
-	import cairo
-	imgsf = cairo.ImageSurface.create_from_png('data/front-bg-white.png')
-	ctx.set_source_surface(imgsf, 0.5, 0.5)
-	ctx.paint()
+
+        # Getting JPG image
+        im = Image.open('output/carnets/18084850.jpg')
+        buf = StringIO.StringIO()
+        im.save(buf, format="PNG")
+        buf.seek(0)
+
+        imgsf = cairo.ImageSurface.create_from_png(buf)
+        ctx.set_source_surface(imgsf, 0.5, 0.5)
+        ctx.paint()
         return
 
 
