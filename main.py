@@ -8,7 +8,7 @@ from employee import Employee
 
 # ---- FOR COMMON USE
 def execute_cmd(cmd_string):
-    system("clear")
+    # system("clear")
     a = system(cmd_string)
     print ""
     if a == 0:
