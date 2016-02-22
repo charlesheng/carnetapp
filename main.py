@@ -1,7 +1,8 @@
 #!/usr/bin/python
 from gi.repository import Gtk
 from os import system
-import Image, StringIO, cairo
+from PIL import Image
+import StringIO, cairo
 
 from carnet import Carnet
 from employee import Employee
@@ -86,11 +87,11 @@ class MyWindow(Gtk.Window):
         self.grid.attach(self.txt_surname, 1, 3, 1, 1)
         self.grid.attach(self.txt_surname1, 1, 4, 1, 1)
 
-        self.grid.attach(self.lbl_position, 0, 5, 1, 1)
-        self.grid.attach(self.txt_position, 1, 5, 1, 3)
+        self.grid.attach(self.lbl_department, 0, 5, 1, 1)
+        self.grid.attach(self.txt_department, 1, 5, 1, 3)
 
-        self.grid.attach(self.lbl_department, 0, 8, 1, 1)
-        self.grid.attach(self.txt_department, 1, 8, 1, 3)
+        self.grid.attach(self.lbl_position, 0, 8, 1, 1)
+        self.grid.attach(self.txt_position, 1, 8, 1, 3)
 
         self.grid.attach(self.btn_process, 0, 11, 2, 1)
         self.grid.attach(self.btn_take_picture, 0, 12, 2, 1)
@@ -121,7 +122,7 @@ class MyWindow(Gtk.Window):
             self.image = Gtk.Image.new_from_file('data/front-bg-white.png')
         else:
             self.image = Gtk.Image.new_from_file(
-                'output/carnets/%s.jpg' % file_name)
+                'output/carnets/%s.png' % file_name)
 
         self.grid.attach(self.image, 3, 0, 1, 20)
         self.image.show()
@@ -180,21 +181,22 @@ class MyWindow(Gtk.Window):
         print result  # handle errors etc.
 
     def draw_page(self, operation=None, context=None, page_nr=None):
-        ctx = context.get_cairo_context()
-        w = context.get_width()
-        h = context.get_height()
-        # ctx.set_source_rgb(0.5, 0.5, 1)
-        #ctx.rectangle(w*0.1, h*0.1, w*0.8, h*0.8)
-        #ctx.stroke()
 
-        # Getting JPG image
-        im = Image.open("output/carnets/%s.jpg" % self.employee.pid)
+	page_setup = context.get_page_setup()
+	paper_size = page_setup.get_paper_size()
+	paper_size.set_size(10, 10, Gtk.Unit.INCH)
+	page_setup.set_paper_size(paper_size)
+
+	# Getting JPG image
+        im = Image.open("output/carnets/%s.png" % self.employee.pid)
         buf = StringIO.StringIO()
         im.save(buf, format="PNG")
         buf.seek(0)
 
-        imgsf = cairo.ImageSurface.create_from_png(buf)
-        ctx.set_source_surface(imgsf, 0.5, 0.5)
+	surface = cairo.ImageSurface.create_from_png(buf)
+        ctx = context.get_cairo_context()
+	print surface.get_width(), surface.get_height()
+	ctx.set_source_surface(surface, 0.0, 0.0)
         ctx.paint()
 
 if __name__ == "__main__":

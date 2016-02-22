@@ -24,7 +24,7 @@ class Employee:
             self.sname = r['snombre']
             self.surname = r['papellido']
             self.ssurname = r['sapellido']
-            self.position = r['cargo']
+            self.position = r['cargo'] + "\n\n"
             self.department = r['dpto'] + "\n\n"
         else:
             raise Exception("Sorry I can't find '%s'" % employee_id)

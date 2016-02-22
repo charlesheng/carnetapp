@@ -3,7 +3,7 @@ import cv2
 
 def capture(img_file):
 
-    video = cv2.VideoCapture(0)
+    video = cv2.VideoCapture(1)
 
     while True:
         ret, im = video.read()

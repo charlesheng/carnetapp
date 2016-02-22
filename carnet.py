@@ -23,30 +23,32 @@ class Carnet:
     def create(self):
         imbg = Image.open(self._bg_img_path)
         imph = Image.open('output/pics/%s.jpg' % self._employee.pid)
-        carnet_file = "output/carnets/%s.jpg" % self._employee.pid
+        carnet_file = "output/carnets/%s.png" % self._employee.pid
         dpmt = self._employee.department.split("\n")
+        empos = self._employee.position.split("\n")
 
         draw = ImageDraw.Draw(imbg)
-        font = ImageFont.truetype(self._font_path, size=14)
+        font = ImageFont.truetype(self._font_path, size=18)
         font2 = ImageFont.truetype(self._font_path, size=18)
-        font3 = ImageFont.truetype(self._font_path, size=32)
+        font3 = ImageFont.truetype(self._font_path, size=22)
 
-        line_size = 15
+        line_size = 20
+        empos_line_size = 28
 
-        idnum_xpos = 180
-        idnum_ypos = 275
+        idnum_xpos = 173
+        idnum_ypos = 302
 
-        name_xpos = 180
-        name_ypos = 172
+        name_xpos = 173
+        name_ypos = 165
 
-        surname_xpos = 180
-        surname_ypos = 222
+        surname_xpos = 173
+        surname_ypos = 232
 
         dpto_xpos = 20
         dpto_ypos = 340
 
         position_xpos = 20
-        position_ypos = 580
+        position_ypos = 615
 
         draw.text(
             (idnum_xpos, idnum_ypos + line_size * 0),
@@ -101,9 +103,15 @@ class Carnet:
         )
 
         draw.text(
-            (position_xpos, position_ypos),
-            self._employee.position,
-            (0, 0, 0),
+            (position_xpos, position_ypos + empos_line_size * 0),
+            empos[0],
+            (255, 255, 255),
+            font=font3
+        )
+        draw.text(
+            (position_xpos, position_ypos + empos_line_size * 1),
+            empos[1],
+            (255, 255, 255),
             font=font3
         )
 
@@ -122,7 +130,7 @@ class Carnet:
 
         imbg.paste(region, (photo_xpos, photo_ypos))
 
-        imbg.save(carnet_file, 'JPEG')
+        imbg.save(carnet_file, 'PNG')
 
 
 if __name__ == "__main__":
