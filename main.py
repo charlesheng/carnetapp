@@ -173,22 +173,34 @@ class MyWindow(Gtk.Window):
             self.load_image(self.employee.pid)
 
     def on_btn_print_clicked(self, widget):
-        pd = Gtk.PrintOperation()
-        pd.set_n_pages(1)
-        pd.connect("draw_page", self.draw_page)
-        result = pd.run(
+        self.pd = Gtk.PrintOperation()
+        self.pd.set_n_pages(1)
+	self.pd.set_use_full_page(True)
+        self.pd.connect("draw_page", self.draw_page)
+        result = self.pd.run(
             Gtk.PrintOperationAction.PRINT_DIALOG, None)
+
         print result  # handle errors etc.
 
     def draw_page(self, operation=None, context=None, page_nr=None):
 
-	page_setup = context.get_page_setup()
-	paper_size = page_setup.get_paper_size()
-	paper_size.set_size(10, 10, Gtk.Unit.INCH)
-	page_setup.set_paper_size(paper_size)
+	psettings = self.pd.get_print_settings()
+	psize = psettings.get_paper_size()
+	psize.set_size(10, 10, Gtk.Unit.MM)
+	psettings.set_paper_size(psize)
+	self.pd.set_print_settings(psettings)
+
+	w = int(context.get_width())
+	h = int(context.get_height())
+
+	#page_setup = context.get_page_setup()
+	#paper_size = page_setup.get_paper_size()
+	#paper_size.set_size(10, 10, Gtk.Unit.INCH)
+	#page_setup.set_paper_size(paper_size)
 
 	# Getting JPG image
         im = Image.open("output/carnets/%s.png" % self.employee.pid)
+	im = im.resize((w,h), Image.ANTIALIAS)
         buf = StringIO.StringIO()
         im.save(buf, format="PNG")
         buf.seek(0)
